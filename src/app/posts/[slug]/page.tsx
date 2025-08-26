@@ -16,12 +16,13 @@ export function generateStaticParams() {
   return all.map((p) => ({ slug: p.slug }));
 }
 
-export function generateMetadata({
+export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
-}): Metadata {
-  const post = loadPosts().find((p) => p.slug === params.slug);
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const post = loadPosts().find((p) => p.slug === slug);
   if (!post) return {};
   return {
     title: post.title,
@@ -41,10 +42,15 @@ export function generateMetadata({
   };
 }
 
-export default function PostPage({ params }: { params: Params }) {
+export default async function PostPage({
+  params,
+}: {
+  params: Promise<Params>;
+}) {
+  const { slug } = await params;
   const siteData = loadSite();
   const postsData = loadPosts();
-  const post = postsData.find((p) => p.slug === params.slug);
+  const post = postsData.find((p) => p.slug === slug);
   if (!post) return notFound();
 
   return (
@@ -57,7 +63,10 @@ export default function PostPage({ params }: { params: Params }) {
         <header>
           <h1 className="text-3xl font-bold tracking-tight">{post.title}</h1>
           <p className="mt-2 text-sm text-gray-600">
-            {post.author} • {new Date(post.publishedAt).toLocaleDateString()}
+            {post.author} •{" "}
+            {post.publishedAt
+              ? new Date(post.publishedAt).toLocaleDateString()
+              : "Unknown date"}
           </p>
           <div className="mt-6 relative aspect-[16/9] w-full rounded bg-gray-100 overflow-hidden">
             {post.imageUrl ? (
