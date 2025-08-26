@@ -24,3 +24,7 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.image-cover {
+  @apply h-full w-full object-cover;
+}

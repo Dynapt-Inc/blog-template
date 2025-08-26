@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Blog Template
 
-## Getting Started
+This is a Next.js + TypeScript + Tailwind blog template designed for programmatic content updates via Git.
 
-First, run the development server:
+### Local Development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Add a Post
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Create a markdown or text file in `src/content/posts/`, e.g. `my-post.md`.
+- First non-empty line becomes the title; rest is the content. An excerpt is auto-derived.
 
-## Learn More
+### Continuous Deployment (Azure Container Apps)
 
-To learn more about Next.js, take a look at the following resources:
+On push to `main`, GitHub Actions builds and deploys the app.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Required GitHub secrets:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `AZURE_CLIENT_ID`
+- `AZURE_TENANT_ID`
+- `AZURE_SUBSCRIPTION_ID`
+- `AZURE_RESOURCE_GROUP`
+- `AZURE_CONTAINER_APP_NAME`
+- `ACR_NAME` (Azure Container Registry name)
+- `ACR_LOGIN_SERVER` (e.g. `myregistry.azurecr.io`)
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+When a new post is committed, the workflow builds an image and updates the Container App.

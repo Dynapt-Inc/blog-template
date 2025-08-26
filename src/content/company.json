@@ -1,0 +1,14 @@
+{
+  "site": {
+    "siteName": "Acme Insights Blog",
+    "logoUrl": "/next.svg",
+    "heroTitle": "Insights and stories from the Acme team",
+    "heroSubtitle": "Thought leadership, case studies, and best practices to help you grow.",
+    "heroImageUrl": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1600&auto=format&fit=crop",
+    "aboutText": "We are a team of engineers, designers, and strategists helping companies deliver delightful digital products.",
+    "aboutImageUrl": "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1200&auto=format&fit=crop",
+    "contactEmail": "hello@acme.co",
+    "contactPhone": "+1 (415) 555-0101",
+    "contactAddress": "500 Market St, San Francisco, CA"
+  }
+}
