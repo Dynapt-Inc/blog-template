@@ -54,9 +54,22 @@ function readJson<T>(filePath: string): T | null {
 
 export function loadSite(): SiteData {
   const company = readJson<CompanyFile>(path.join(contentRoot, "company.json"));
-  if (company?.site) return company.site;
+  // Allow environment override for organization/site name and logo at runtime
+  if (company?.site) {
+    const envSiteName =
+      process.env.NEXT_PUBLIC_ORG_NAME || process.env.ORG_NAME;
+    const envLogoUrl =
+      process.env.NEXT_PUBLIC_ORG_LOGO_URL || process.env.ORG_LOGO_URL;
+    return {
+      ...company.site,
+      siteName: envSiteName?.trim() || company.site.siteName,
+      logoUrl: envLogoUrl?.trim() || company.site.logoUrl,
+    };
+  }
   return {
-    siteName: "Your Company Blog",
+    siteName: (process.env.NEXT_PUBLIC_ORG_NAME ||
+      process.env.ORG_NAME ||
+      "Your Company Blog") as string,
     heroTitle: "Insights and stories from our team",
     heroSubtitle:
       "Thought leadership, case studies, and best practices to help you grow.",
