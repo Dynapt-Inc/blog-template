@@ -13,17 +13,17 @@ export function Hero({ title, subtitle, imageUrl }: HeroProps) {
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
           {title}
         </h1>
-        <p className="mt-4 text-lg text-gray-600">{subtitle}</p>
+        <p className="mt-4 text-lg text-muted-foreground">{subtitle}</p>
         <div className="mt-6 flex gap-3">
           <Link
             href="/posts"
-            className="inline-flex items-center rounded bg-gray-900 px-4 py-2 text-white"
+            className="inline-flex items-center rounded bg-primary px-4 py-2 text-white hover:opacity-90 transition-opacity"
           >
             Read articles
           </Link>
         </div>
       </div>
-      <div className="relative aspect-[16/10] w-full rounded-lg bg-gray-100 overflow-hidden">
+      <div className="relative aspect-[16/10] w-full rounded-lg bg-muted overflow-hidden">
         {imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={imageUrl} alt="" className="image-cover" />
