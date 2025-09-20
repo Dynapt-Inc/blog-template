@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { loadSite } from "@/lib/content";
+import {
+  loadSite,
+  loadTheme,
+  loadSeo,
+  SeoData,
+  ThemeData,
+} from "@/lib/content";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,9 +21,13 @@ const geistMono = Geist_Mono({
 
 export function generateMetadata(): Metadata {
   const site = loadSite();
+  const seo: SeoData | undefined = site.seo || loadSeo();
   return {
-    title: site.siteName,
-    description: site.heroSubtitle,
+    title: seo?.title || site.siteName,
+    description: seo?.description || site.heroSubtitle,
+    keywords: Array.isArray(seo?.keywords)
+      ? seo?.keywords
+      : (seo?.keywords as any),
   };
 }
 
@@ -26,10 +36,18 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const theme: ThemeData | undefined = loadTheme();
+  const styleVars: Record<string, string | undefined> = {
+    "--primary": theme?.colors?.primary,
+    "--secondary": theme?.colors?.secondary,
+    "--background": theme?.colors?.background,
+    "--foreground": theme?.colors?.foreground,
+  };
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        style={styleVars as React.CSSProperties}
       >
         {children}
       </body>

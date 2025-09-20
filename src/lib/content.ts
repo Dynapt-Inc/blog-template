@@ -12,6 +12,8 @@ export interface SiteData {
   contactEmail?: string;
   contactPhone?: string;
   contactAddress?: string;
+  theme?: ThemeData;
+  seo?: SeoData;
 }
 
 export interface PostData {
@@ -28,6 +30,8 @@ export interface PostData {
 
 interface CompanyFile {
   site?: SiteData;
+  theme?: ThemeData;
+  seo?: SeoData;
 }
 
 interface RawPostData {
@@ -64,6 +68,8 @@ export function loadSite(): SiteData {
       ...company.site,
       siteName: envSiteName?.trim() || company.site.siteName,
       logoUrl: envLogoUrl?.trim() || company.site.logoUrl,
+      theme: loadTheme(),
+      seo: loadSeo(),
     };
   }
   return {
@@ -75,7 +81,47 @@ export function loadSite(): SiteData {
       "Thought leadership, case studies, and best practices to help you grow.",
     aboutText:
       "We are a team of experts passionate about helping businesses succeed.",
+    theme: loadTheme(),
+    seo: loadSeo(),
   };
+}
+
+export interface ThemeData {
+  colors?: {
+    primary?: string;
+    secondary?: string;
+    background?: string;
+    foreground?: string;
+  };
+}
+
+export function loadTheme(): ThemeData | undefined {
+  const company = readJson<CompanyFile>(path.join(contentRoot, "company.json"));
+  const cfg = company?.theme || (company as any)?.site?.theme || {};
+  const envPrimary = process.env.NEXT_PUBLIC_PRIMARY_COLOR;
+  const envSecondary = process.env.NEXT_PUBLIC_SECONDARY_COLOR;
+  const envBackground = process.env.NEXT_PUBLIC_BACKGROUND_COLOR;
+  const envForeground = process.env.NEXT_PUBLIC_FOREGROUND_COLOR;
+  return {
+    colors: {
+      primary: envPrimary || cfg.colors?.primary,
+      secondary: envSecondary || cfg.colors?.secondary,
+      background: envBackground || cfg.colors?.background,
+      foreground: envForeground || cfg.colors?.foreground,
+    },
+  };
+}
+
+export interface SeoData {
+  title?: string;
+  description?: string;
+  keywords?: string | string[];
+}
+
+export function loadSeo(): SeoData | undefined {
+  const company = readJson<CompanyFile>(path.join(contentRoot, "company.json"));
+  const seo = company?.seo || {};
+  return seo;
 }
 
 export function loadPosts(): PostData[] {
