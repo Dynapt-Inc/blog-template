@@ -25,9 +25,11 @@ export function generateMetadata(): Metadata {
   return {
     title: seo?.title || site.siteName,
     description: seo?.description || site.heroSubtitle,
-    keywords: Array.isArray(seo?.keywords)
-      ? seo?.keywords
-      : (seo?.keywords as any),
+    keywords: seo?.keywords
+      ? Array.isArray(seo.keywords)
+        ? seo.keywords
+        : [seo.keywords]
+      : undefined,
   };
 }
 

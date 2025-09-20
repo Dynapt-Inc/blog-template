@@ -29,7 +29,7 @@ export interface PostData {
 }
 
 interface CompanyFile {
-  site?: SiteData;
+  site?: SiteData & { theme?: ThemeData };
   theme?: ThemeData;
   seo?: SeoData;
 }
@@ -97,7 +97,7 @@ export interface ThemeData {
 
 export function loadTheme(): ThemeData | undefined {
   const company = readJson<CompanyFile>(path.join(contentRoot, "company.json"));
-  const cfg = company?.theme || (company as any)?.site?.theme || {};
+  const cfg = company?.theme || company?.site?.theme || {};
   const envPrimary = process.env.NEXT_PUBLIC_PRIMARY_COLOR;
   const envSecondary = process.env.NEXT_PUBLIC_SECONDARY_COLOR;
   const envBackground = process.env.NEXT_PUBLIC_BACKGROUND_COLOR;
