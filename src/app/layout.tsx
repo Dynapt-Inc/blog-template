@@ -39,12 +39,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const theme: ThemeData | undefined = loadTheme();
+
+  // Prioritize environment variables for runtime CSS custom properties
   const styleVars: Record<string, string | undefined> = {
-    "--primary": theme?.colors?.primary,
-    "--secondary": theme?.colors?.secondary,
-    "--background": theme?.colors?.background,
-    "--foreground": theme?.colors?.foreground,
+    "--primary":
+      process.env.NEXT_PUBLIC_PRIMARY_COLOR || theme?.colors?.primary,
+    "--secondary":
+      process.env.NEXT_PUBLIC_SECONDARY_COLOR || theme?.colors?.secondary,
+    "--background":
+      process.env.NEXT_PUBLIC_BACKGROUND_COLOR || theme?.colors?.background,
+    "--foreground":
+      process.env.NEXT_PUBLIC_FOREGROUND_COLOR || theme?.colors?.foreground,
   };
+
   return (
     <html lang="en">
       <body

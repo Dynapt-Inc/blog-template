@@ -58,29 +58,39 @@ function readJson<T>(filePath: string): T | null {
 
 export function loadSite(): SiteData {
   const company = readJson<CompanyFile>(path.join(contentRoot, "company.json"));
-  // Allow environment override for organization/site name and logo at runtime
-  if (company?.site) {
-    const envSiteName =
-      process.env.NEXT_PUBLIC_ORG_NAME || process.env.ORG_NAME;
-    const envLogoUrl =
-      process.env.NEXT_PUBLIC_ORG_LOGO_URL || process.env.ORG_LOGO_URL;
-    return {
-      ...company.site,
-      siteName: envSiteName?.trim() || company.site.siteName,
-      logoUrl: envLogoUrl?.trim() || company.site.logoUrl,
-      theme: loadTheme(),
-      seo: loadSeo(),
-    };
-  }
+
+  // Prioritize environment variables for runtime personalization
+  const envSiteName = process.env.NEXT_PUBLIC_ORG_NAME || process.env.ORG_NAME;
+  const envLogoUrl =
+    process.env.NEXT_PUBLIC_ORG_LOGO_URL || process.env.ORG_LOGO_URL;
+  const envSeoTitle = process.env.NEXT_PUBLIC_SEO_TITLE;
+  const envSeoDescription = process.env.NEXT_PUBLIC_SEO_DESCRIPTION;
+
+  // Use environment variables first, then fall back to company.json, then defaults
+  const siteName =
+    envSiteName?.trim() || company?.site?.siteName || "Your Company Blog";
+  const logoUrl = envLogoUrl?.trim() || company?.site?.logoUrl;
+  const heroTitle =
+    company?.site?.heroTitle ||
+    `Insights and stories from the ${siteName} team`;
+  const heroSubtitle =
+    company?.site?.heroSubtitle ||
+    "Thought leadership, case studies, and best practices to help you grow.";
+  const aboutText =
+    company?.site?.aboutText ||
+    "We are a team of experts passionate about helping businesses succeed.";
+
   return {
-    siteName: (process.env.NEXT_PUBLIC_ORG_NAME ||
-      process.env.ORG_NAME ||
-      "Your Company Blog") as string,
-    heroTitle: "Insights and stories from our team",
-    heroSubtitle:
-      "Thought leadership, case studies, and best practices to help you grow.",
-    aboutText:
-      "We are a team of experts passionate about helping businesses succeed.",
+    siteName,
+    logoUrl,
+    heroTitle,
+    heroSubtitle,
+    heroImageUrl: company?.site?.heroImageUrl,
+    aboutText,
+    aboutImageUrl: company?.site?.aboutImageUrl,
+    contactEmail: company?.site?.contactEmail,
+    contactPhone: company?.site?.contactPhone,
+    contactAddress: company?.site?.contactAddress,
     theme: loadTheme(),
     seo: loadSeo(),
   };
@@ -120,8 +130,17 @@ export interface SeoData {
 
 export function loadSeo(): SeoData | undefined {
   const company = readJson<CompanyFile>(path.join(contentRoot, "company.json"));
-  const seo = company?.seo || {};
-  return seo;
+
+  // Prioritize environment variables for SEO
+  const envTitle = process.env.NEXT_PUBLIC_SEO_TITLE;
+  const envDescription = process.env.NEXT_PUBLIC_SEO_DESCRIPTION;
+  const envKeywords = process.env.NEXT_PUBLIC_SEO_KEYWORDS;
+
+  return {
+    title: envTitle || company?.seo?.title,
+    description: envDescription || company?.seo?.description,
+    keywords: envKeywords || company?.seo?.keywords,
+  };
 }
 
 export function loadPosts(): PostData[] {
