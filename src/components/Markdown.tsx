@@ -2,58 +2,211 @@ interface MarkdownProps {
   content: string;
 }
 
-// Minimal markdown renderer for headings, lists, and paragraphs.
+// Enhanced markdown renderer with better typography and reading experience
 export function Markdown({ content }: MarkdownProps) {
   const lines = content.split("\n");
-  return (
-    <div className="prose prose-neutral max-w-none">
-      {lines.map((line, index) => {
-        if (line.startsWith("# ")) {
-          return (
-            <h1 key={index} className="text-3xl font-bold mt-8 mb-4">
-              {line.substring(2)}
-            </h1>
-          );
-        }
-        if (line.startsWith("## ")) {
-          return (
-            <h2 key={index} className="text-2xl font-semibold mt-6 mb-3">
-              {line.substring(3)}
-            </h2>
-          );
-        }
-        if (line.startsWith("### ")) {
-          return (
-            <h3 key={index} className="text-xl font-medium mt-4 mb-2">
-              {line.substring(4)}
-            </h3>
-          );
-        }
-        if (line.startsWith("- ")) {
-          return (
-            <li key={index} className="ml-6 list-disc">
-              {line.substring(2)}
-            </li>
-          );
-        }
-        if (line.trim() === "") {
-          return <br key={index} />;
-        }
-        if (/^\d+\.\s+/.test(line)) {
-          return (
-            <li key={index} className="ml-6 list-decimal">
-              {line.replace(/^\d+\.\s+/, "")}
-            </li>
-          );
-        }
-        return (
-          <p key={index} className="leading-7 text-[15px] text-neutral-800">
-            {line}
-          </p>
+  let inCodeBlock = false;
+  let inQuoteBlock = false;
+  let codeBlockContent: string[] = [];
+  let quoteBlockContent: string[] = [];
+
+  const elements: JSX.Element[] = [];
+
+  const processInlineFormatting = (text: string) => {
+    // Process bold **text**
+    text = text.replace(
+      /\*\*(.*?)\*\*/g,
+      '<strong class="font-semibold">$1</strong>'
+    );
+    // Process italic *text*
+    text = text.replace(/\*(.*?)\*/g, '<em class="italic">$1</em>');
+    // Process inline code `code`
+    text = text.replace(
+      /`([^`]+)`/g,
+      '<code class="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">$1</code>'
+    );
+    // Process links [text](url)
+    text = text.replace(
+      /\[([^\]]+)\]\(([^)]+)\)/g,
+      '<a href="$2" class="text-primary hover:underline">$1</a>'
+    );
+
+    return text;
+  };
+
+  lines.forEach((line, index) => {
+    // Handle code blocks
+    if (line.trim().startsWith("```")) {
+      if (inCodeBlock) {
+        // End code block
+        const language =
+          codeBlockContent[0]?.replace("```", "").trim() || "text";
+        const code = codeBlockContent.slice(1).join("\n");
+        elements.push(
+          <div key={index} className="my-6">
+            <div className="bg-muted/50 border border-theme rounded-t-lg px-4 py-2 text-sm font-medium text-muted-foreground">
+              {language}
+            </div>
+            <pre className="bg-gray-900 text-gray-100 p-4 rounded-b-lg overflow-x-auto">
+              <code>{code}</code>
+            </pre>
+          </div>
         );
-      })}
-    </div>
-  );
+        codeBlockContent = [];
+        inCodeBlock = false;
+      } else {
+        // Start code block
+        inCodeBlock = true;
+        codeBlockContent = [line];
+      }
+      return;
+    }
+
+    if (inCodeBlock) {
+      codeBlockContent.push(line);
+      return;
+    }
+
+    // Handle blockquotes
+    if (line.startsWith("> ")) {
+      if (!inQuoteBlock) {
+        inQuoteBlock = true;
+        quoteBlockContent = [];
+      }
+      quoteBlockContent.push(line.substring(2));
+      return;
+    } else if (inQuoteBlock) {
+      // End quote block
+      elements.push(
+        <blockquote
+          key={index}
+          className="border-l-4 border-primary pl-6 py-4 my-6 bg-muted/30 rounded-r-lg italic"
+        >
+          {quoteBlockContent.map((quoteLine, qIndex) => (
+            <p
+              key={qIndex}
+              className="mb-2 last:mb-0"
+              dangerouslySetInnerHTML={{
+                __html: processInlineFormatting(quoteLine),
+              }}
+            />
+          ))}
+        </blockquote>
+      );
+      quoteBlockContent = [];
+      inQuoteBlock = false;
+    }
+
+    // Handle headings
+    if (line.startsWith("# ")) {
+      elements.push(
+        <h1
+          key={index}
+          className="prose-h1 scroll-mt-16"
+          id={line.substring(2).toLowerCase().replace(/\s+/g, "-")}
+        >
+          {line.substring(2)}
+        </h1>
+      );
+      return;
+    }
+
+    if (line.startsWith("## ")) {
+      elements.push(
+        <h2
+          key={index}
+          className="prose-h2 scroll-mt-16"
+          id={line.substring(3).toLowerCase().replace(/\s+/g, "-")}
+        >
+          {line.substring(3)}
+        </h2>
+      );
+      return;
+    }
+
+    if (line.startsWith("### ")) {
+      elements.push(
+        <h3
+          key={index}
+          className="prose-h3 scroll-mt-16"
+          id={line.substring(4).toLowerCase().replace(/\s+/g, "-")}
+        >
+          {line.substring(4)}
+        </h3>
+      );
+      return;
+    }
+
+    // Handle lists
+    if (line.startsWith("- ")) {
+      elements.push(
+        <li
+          key={index}
+          className="prose-li"
+          dangerouslySetInnerHTML={{
+            __html: processInlineFormatting(line.substring(2)),
+          }}
+        />
+      );
+      return;
+    }
+
+    if (/^\d+\.\s+/.test(line)) {
+      elements.push(
+        <li
+          key={index}
+          className="prose-li list-decimal"
+          dangerouslySetInnerHTML={{
+            __html: processInlineFormatting(line.replace(/^\d+\.\s+/, "")),
+          }}
+        />
+      );
+      return;
+    }
+
+    // Handle horizontal rules
+    if (line.trim() === "---" || line.trim() === "***") {
+      elements.push(<hr key={index} className="my-8 border-t border-theme" />);
+      return;
+    }
+
+    // Handle empty lines
+    if (line.trim() === "") {
+      elements.push(<div key={index} className="h-4" />);
+      return;
+    }
+
+    // Handle paragraphs
+    elements.push(
+      <p
+        key={index}
+        className="prose-p"
+        dangerouslySetInnerHTML={{ __html: processInlineFormatting(line) }}
+      />
+    );
+  });
+
+  // Handle any remaining quote block
+  if (inQuoteBlock && quoteBlockContent.length > 0) {
+    elements.push(
+      <blockquote
+        key="final-quote"
+        className="border-l-4 border-primary pl-6 py-4 my-6 bg-muted/30 rounded-r-lg italic"
+      >
+        {quoteBlockContent.map((quoteLine, qIndex) => (
+          <p
+            key={qIndex}
+            className="mb-2 last:mb-0"
+            dangerouslySetInnerHTML={{
+              __html: processInlineFormatting(quoteLine),
+            }}
+          />
+        ))}
+      </blockquote>
+    );
+  }
+
+  return <div className="prose prose-lg max-w-none">{elements}</div>;
 }
 
 export default Markdown;

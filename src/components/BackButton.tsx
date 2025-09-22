@@ -20,14 +20,13 @@ export function BackButton({ fallbackUrl = "/posts" }: BackButtonProps) {
     <Link
       href={fallbackUrl}
       onClick={handleBackClick}
-      className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-theme bg-card hover:bg-muted text-muted-foreground hover:text-primary transition-all duration-200 group"
     >
       <svg
-        className="w-4 h-4"
+        className="w-4 h-4 transition-transform group-hover:-translate-x-1"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
       >
         <path
           strokeLinecap="round"
@@ -36,7 +35,7 @@ export function BackButton({ fallbackUrl = "/posts" }: BackButtonProps) {
           d="M15 19l-7-7 7-7"
         />
       </svg>
-      Back
+      <span className="font-medium">Back to Articles</span>
     </Link>
   );
 }

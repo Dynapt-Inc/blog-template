@@ -100,6 +100,7 @@ export interface ThemeData {
   colors?: {
     primary?: string;
     secondary?: string;
+    tertiary?: string;
     background?: string;
     foreground?: string;
   };
@@ -110,12 +111,14 @@ export function loadTheme(): ThemeData | undefined {
   const cfg = company?.theme || company?.site?.theme || {};
   const envPrimary = process.env.NEXT_PUBLIC_PRIMARY_COLOR;
   const envSecondary = process.env.NEXT_PUBLIC_SECONDARY_COLOR;
+  const envTertiary = process.env.NEXT_PUBLIC_TERTIARY_COLOR;
   const envBackground = process.env.NEXT_PUBLIC_BACKGROUND_COLOR;
   const envForeground = process.env.NEXT_PUBLIC_FOREGROUND_COLOR;
   return {
     colors: {
       primary: envPrimary || cfg.colors?.primary,
       secondary: envSecondary || cfg.colors?.secondary,
+      tertiary: envTertiary || cfg.colors?.tertiary,
       background: envBackground || cfg.colors?.background,
       foreground: envForeground || cfg.colors?.foreground,
     },

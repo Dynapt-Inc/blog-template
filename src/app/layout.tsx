@@ -46,6 +46,8 @@ export default function RootLayout({
       process.env.NEXT_PUBLIC_PRIMARY_COLOR || theme?.colors?.primary,
     "--secondary":
       process.env.NEXT_PUBLIC_SECONDARY_COLOR || theme?.colors?.secondary,
+    "--tertiary":
+      process.env.NEXT_PUBLIC_TERTIARY_COLOR || theme?.colors?.tertiary,
     "--background":
       process.env.NEXT_PUBLIC_BACKGROUND_COLOR || theme?.colors?.background,
     "--foreground":
