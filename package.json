@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "next dev",
     "clean": "rimraf dist",
-    "build:ts": "tsc -p tsconfig.build.json",
+    "build:ts": "echo 'Compiling TypeScript...' && tsc -p tsconfig.build.json && echo 'Rewriting path aliases...' && tsc-alias -p tsconfig.build.json && echo 'TypeScript build complete!'",
     "build": "npm run clean && npm run build:ts && node ./scripts/copy-assets.cjs",
     "start": "next start",
     "lint": "eslint",
@@ -45,6 +45,8 @@
     "libsodium-wrappers": "^0.7.13",
     "rimraf": "^5.0.0",
     "tailwindcss": "^4",
+    "tsc-alias": "^1.8.16",
+    "tsup": "^8.5.0",
     "typescript": "^5"
   }
 }
