@@ -3,22 +3,35 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "clean": "rimraf dist",
+    "build:ts": "tsc -p tsconfig.build.json",
+    "build": "npm run clean && npm run build:ts && node ./scripts/copy-assets.cjs",
     "start": "next start",
     "lint": "eslint",
     "setup:secrets": "node --env-file=.env.local ./scripts/secrets-setup.ts"
   },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": [
+    "./dist/styles/globals.css"
+  ],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "default": "./src/index.ts"
-    }
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./styles/globals.css": "./dist/styles/globals.css"
   },
   "dependencies": {
     "mysql2": "^3.11.3",
     "next": "15.5.0",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "rimraf": "^5.0.10"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -30,6 +43,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.5.0",
     "libsodium-wrappers": "^0.7.13",
+    "rimraf": "^5.0.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
