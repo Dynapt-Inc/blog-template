@@ -1,3 +1,4 @@
+import Link from "next/link";
 import PostCard from "@/components/PostCard";
 import { type PostData } from "@/lib/content";
 
@@ -71,7 +72,7 @@ export function RelatedPosts({
 
       {/* CTA to view all posts */}
       <div className="text-center mt-12">
-        <a href="/posts" className="btn btn-ghost btn-lg group">
+        <Link href="/posts" className="btn btn-ghost btn-lg group">
           <span>Explore All Articles</span>
           <svg
             className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1"
@@ -86,7 +87,7 @@ export function RelatedPosts({
               d="M17 8l4 4m0 0l-4 4m4-4H3"
             />
           </svg>
-        </a>
+        </Link>
       </div>
     </section>
   );

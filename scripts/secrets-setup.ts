@@ -188,6 +188,15 @@ export async function addGitHubSecrets(
     AZURE_CREDENTIALS: azureCredentialsJson,
     REGISTRY_USERNAME: acr.username,
     REGISTRY_PASSWORD: acr.password,
+    COSMOS_MYSQL_HOST: process.env.COSMOS_MYSQL_HOST,
+    COSMOS_MYSQL_PORT: process.env.COSMOS_MYSQL_PORT,
+    COSMOS_MYSQL_USERNAME: process.env.COSMOS_MYSQL_USERNAME,
+    COSMOS_MYSQL_PASSWORD: process.env.COSMOS_MYSQL_PASSWORD,
+    COSMOS_MYSQL_DATABASE: process.env.COSMOS_MYSQL_DATABASE,
+    COSMOS_MYSQL_SSL: process.env.COSMOS_MYSQL_SSL,
+    COSMOS_MYSQL_CA_CERT: process.env.COSMOS_MYSQL_CA_CERT,
+    BLOG_TENANT_ID: process.env.BLOG_TENANT_ID,
+    NEXT_PUBLIC_BLOG_TENANT_ID: process.env.NEXT_PUBLIC_BLOG_TENANT_ID,
   };
 
   // 3) Encrypt and PUT each secret

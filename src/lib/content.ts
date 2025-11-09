@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { fetchPostBySlug, fetchPublishedPosts, type BlogPostRecord } from "./posts";
 
 export interface SiteData {
   siteName: string;
@@ -25,24 +26,14 @@ export interface PostData {
   author?: string;
   publishedAt?: string;
   content: string;
-  sourcePath?: string;
+  sourcePath?: string | null;
+  url?: string | null;
 }
 
 interface CompanyFile {
   site?: SiteData & { theme?: ThemeData };
   theme?: ThemeData;
   seo?: SeoData;
-}
-
-interface RawPostData {
-  slug?: string;
-  title?: string;
-  excerpt?: string;
-  category?: string;
-  imageUrl?: string;
-  author?: string;
-  publishedAt?: string;
-  content?: string;
 }
 
 const contentRoot = path.join(process.cwd(), "src", "content");
@@ -63,9 +54,6 @@ export function loadSite(): SiteData {
   const envSiteName = process.env.NEXT_PUBLIC_ORG_NAME || process.env.ORG_NAME;
   const envLogoUrl =
     process.env.NEXT_PUBLIC_ORG_LOGO_URL || process.env.ORG_LOGO_URL;
-  const envSeoTitle = process.env.NEXT_PUBLIC_SEO_TITLE;
-  const envSeoDescription = process.env.NEXT_PUBLIC_SEO_DESCRIPTION;
-
   // Use environment variables first, then fall back to company.json, then defaults
   const siteName =
     envSiteName?.trim() || company?.site?.siteName || "Your Company Blog";
@@ -146,76 +134,80 @@ export function loadSeo(): SeoData | undefined {
   };
 }
 
-export function loadPosts(): PostData[] {
-  const collected: PostData[] = [];
+function resolveTenantId(): string | null {
+  const explicit = process.env.BLOG_TENANT_ID?.trim();
+  if (explicit) return explicit;
+  const publicId = process.env.NEXT_PUBLIC_BLOG_TENANT_ID?.trim();
+  if (publicId) return publicId;
+  return null;
+}
 
-  // Load per-file posts from src/content/posts/*.json
-  const postsDir = path.join(contentRoot, "posts");
-  if (fs.existsSync(postsDir)) {
-    const files = fs.readdirSync(postsDir).sort();
-    for (const f of files) {
-      const full = path.join(postsDir, f);
-      if (!f.endsWith(".json")) continue;
+function fallbackExcerpt(content: string, maxLen = 180): string {
+  const plainText = content
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/`[^`]*`/g, " ")
+    .replace(/[#>*_`\-]/g, " ")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .join(" ");
+  return plainText.slice(0, maxLen).trim();
+}
 
-      const fileBaseSlug = f.replace(/\.json$/i, "");
-      const rawData = readJson<RawPostData | RawPostData[]>(full);
-      if (!rawData) continue;
+function recordToPost(record: BlogPostRecord): PostData {
+  const metadata = record.metadata || {};
+  const category =
+    typeof metadata.category === "string" && metadata.category.trim().length
+      ? (metadata.category as string)
+      : undefined;
+  const imageUrl =
+    typeof metadata.imageUrl === "string" && metadata.imageUrl.trim().length
+      ? (metadata.imageUrl as string)
+      : undefined;
+  const author =
+    typeof metadata.author === "string" && metadata.author.trim().length
+      ? (metadata.author as string)
+      : "Editorial Team";
 
-      const toPostData = (record: RawPostData): PostData | null => {
-        const slug = (record?.slug as string) || fileBaseSlug;
-        const content = (record?.content as string) || "";
-        const titleFromHeading = content
-          .split("\n")
-          .find((line) => line.trim().startsWith("# "))
-          ?.replace(/^#\s+/, "")
-          ?.trim();
-        const plainText = content
-          .replace(/```[\s\S]*?```/g, " ")
-          .replace(/`[^`]*`/g, " ")
-          .replace(/[#>*_`\-]/g, " ")
-          .split("\n")
-          .map((line) => line.trim())
-          .filter(Boolean)
-          .join(" ");
-        const humanizedFromSlug = slug
-          .split(/[-_]+/)
-          .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-          .join(" ");
+  const excerpt =
+    (record.excerpt && record.excerpt.trim().length > 0
+      ? record.excerpt
+      : fallbackExcerpt(record.content)) || "";
 
-        const title =
-          (record?.title as string) || titleFromHeading || humanizedFromSlug;
-        const excerpt =
-          (record?.excerpt as string) || plainText.slice(0, 180).trim();
-        const publishedAt =
-          (record?.publishedAt as string) ||
-          new Date().toISOString().slice(0, 10);
-        const author = (record?.author as string) || "Editorial Team";
-        const imageUrl = (record?.imageUrl as string) || undefined;
-        const category = (record?.category as string) || undefined;
+  return {
+    slug: record.slug,
+    title: record.title,
+    excerpt,
+    category,
+    imageUrl,
+    author,
+    publishedAt: record.publishedAt || record.createdAt,
+    content: record.content,
+    sourcePath: null,
+    url: record.url,
+  };
+}
 
-        return {
-          slug,
-          title,
-          excerpt,
-          category,
-          imageUrl,
-          author,
-          publishedAt,
-          content,
-          sourcePath: full,
-        };
-      };
-
-      if (Array.isArray(rawData)) {
-        for (const item of rawData) {
-          const normalized = toPostData(item);
-          if (normalized) collected.push(normalized);
-        }
-      } else {
-        const normalized = toPostData(rawData);
-        if (normalized) collected.push(normalized);
-      }
-    }
+export async function loadPosts(): Promise<PostData[]> {
+  const tenantId = resolveTenantId();
+  if (!tenantId) {
+    console.warn(
+      "[content] BLOG_TENANT_ID is not configured; returning empty post list."
+    );
+    return [];
   }
-  return collected;
+  const records = await fetchPublishedPosts(tenantId);
+  return records.map(recordToPost);
+}
+
+export async function loadPostBySlug(slug: string): Promise<PostData | null> {
+  const tenantId = resolveTenantId();
+  if (!tenantId) {
+    console.warn(
+      "[content] BLOG_TENANT_ID is not configured; cannot load post."
+    );
+    return null;
+  }
+  const record = await fetchPostBySlug(tenantId, slug);
+  return record ? recordToPost(record) : null;
 }

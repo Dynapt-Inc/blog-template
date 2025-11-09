@@ -24,6 +24,7 @@ A beautifully designed, responsive blog template built with Next.js, TypeScript,
 ### 🛠 Technical Features
 
 - **TypeScript**: Fully typed for better development experience
+- **Azure Cosmos DB (MySQL)**: Multi-tenant data backend—no local JSON files required
 - **Environment Variable Support**: Runtime theming and content customization
 - **SEO Optimized**: Meta tags, Open Graph, and Twitter Card support
 - **Performance Optimized**: Fast loading with Next.js App Router
@@ -95,11 +96,12 @@ src/
 │   ├── Markdown.tsx       # Enhanced markdown renderer
 │   ├── BackButton.tsx     # Smart back navigation
 │   └── RelatedPosts.tsx   # Related articles component
-├── content/               # Content and configuration
-│   ├── company.json       # Site configuration and theming
-│   └── posts/             # Article JSON files
+├── content/               # Local configuration
+│   └── company.json       # Site configuration and theming (optional override)
 └── lib/
-    └── content.ts         # Content loading and processing
+    ├── content.ts         # Content loading and processing
+    ├── db.ts              # Cosmos DB connection utilities
+    └── posts.ts           # Queries for published posts
 ```
 
 ## ⚙️ Configuration
@@ -134,7 +136,61 @@ src/
 
 ### Environment Variables
 
-For runtime customization, you can use these environment variables:
+Configure the following variables (all required unless noted):
+
+```env
+# Cosmos DB for MySQL (shared multi-tenant database)
+COSMOS_MYSQL_HOST="your-cosmos-host.mysql.cosmos.azure.com"
+COSMOS_MYSQL_PORT="3306"
+COSMOS_MYSQL_USERNAME="cosmos-user@your-cosmos-host"
+COSMOS_MYSQL_PASSWORD="super-secure-password"
+COSMOS_MYSQL_DATABASE="blog_platform"
+# optional: provide "skip" to disable TLS validation for local proxies
+COSMOS_MYSQL_SSL="required"
+# optional: inline cert or relative path if you use custom CA
+COSMOS_MYSQL_CA_CERT="./certs/cosmos-ca.pem"
+
+# Tenant selector (each blog instance gets a unique tenant id)
+BLOG_TENANT_ID="tenant_1234"
+NEXT_PUBLIC_BLOG_TENANT_ID="tenant_1234"
+
+# Site branding (optional overrides)
+NEXT_PUBLIC_ORG_NAME="Your Organization"
+NEXT_PUBLIC_ORG_LOGO_URL="https://..."
+
+# Theme colors (optional)
+NEXT_PUBLIC_PRIMARY_COLOR="#2563eb"
+NEXT_PUBLIC_SECONDARY_COLOR="#6366f1"
+NEXT_PUBLIC_TERTIARY_COLOR="#06b6d4"
+
+# SEO (optional)
+NEXT_PUBLIC_SEO_TITLE="Your SEO Title"
+NEXT_PUBLIC_SEO_DESCRIPTION="Your SEO Description"
+```
+
+> ℹ️ `BLOG_TENANT_ID` is the authoritative value used on the server. `NEXT_PUBLIC_BLOG_TENANT_ID` is provided so the client bundle can reference the same tenant when needed.
+
+### Runtime Customization
+
+Brand settings and theme colors can still be sourced from `company.json`, but environment variables always take precedence—perfect for automated deployments per tenant.
+
+## 📝 Content Management
+
+### Cosmos-Backed Articles
+
+Articles are no longer stored as JSON files. Instead, every published post resides in the shared Azure Cosmos DB for MySQL instance provisioned by the blog generator:
+
+- The `posts` table is multi-tenant; rows are scoped by `organization_id`.
+- New articles generated via the blog generator are instantly available to every deployed template instance pointing at the corresponding tenant id.
+- Deleting or updating posts happens centrally—no repository changes required.
+
+### Editor Workflow
+
+1. Generate or edit posts inside the blog generator dashboard.
+2. Publish them—this writes to Cosmos DB.
+3. The template reads directly from Cosmos DB at runtime, automatically reflecting new content.
+
+If you need to backfill legacy JSON posts, import them into the `posts` table using the schema provided in the generator repo docs. A sample migration script is included in `docs/cosmos-schema.sql`.
 
 ```env
 # Site branding
@@ -151,33 +207,13 @@ NEXT_PUBLIC_SEO_TITLE="Your SEO Title"
 NEXT_PUBLIC_SEO_DESCRIPTION="Your SEO Description"
 ```
 
-## 📝 Content Management
-
-### Article Structure
-
-Articles are stored as JSON files in `src/content/posts/`:
-
-```json
-{
-  "slug": "article-slug",
-  "title": "Article Title",
-  "excerpt": "Brief description...",
-  "category": "Technology",
-  "imageUrl": "https://...",
-  "author": "Author Name",
-  "publishedAt": "2024-01-15",
-  "content": "Full markdown content..."
-}
-```
-
 ### Supported Content Features
 
-- **Markdown Support**: Full markdown rendering with syntax highlighting
-- **Categories**: Automatic category filtering and organization
-- **Authors**: Author information with avatar generation
-- **Images**: Featured images with responsive optimization
-- **Reading Time**: Automatic calculation based on content length
-- **SEO**: Individual article meta tags and social sharing
+- **Markdown/HTML Support**: Content is stored as HTML, but Markdown can be preprocessed before insertion.
+- **Categories**: Stored per post in metadata within Cosmos DB.
+- **Authors**: Managed via metadata; defaults to “Editorial Team” when omitted.
+- **Images**: Pass `imageUrl` in metadata to render featured media.
+- **SEO**: Individual article meta tags and social sharing ready via stored excerpt/title data.
 
 ## 🎨 Customization
 
@@ -234,7 +270,7 @@ npm run type-check   # Run TypeScript checks
 
 On push to `main`, GitHub Actions builds and deploys the app.
 
-Required GitHub secrets:
+Required GitHub secrets now include Cosmos DB access:
 
 - `AZURE_CLIENT_ID`
 - `AZURE_TENANT_ID`
@@ -243,6 +279,12 @@ Required GitHub secrets:
 - `AZURE_CONTAINER_APP_NAME`
 - `ACR_NAME` (Azure Container Registry name)
 - `ACR_LOGIN_SERVER` (e.g. `myregistry.azurecr.io`)
+- `COSMOS_MYSQL_HOST`
+- `COSMOS_MYSQL_PORT`
+- `COSMOS_MYSQL_USERNAME`
+- `COSMOS_MYSQL_PASSWORD`
+- `COSMOS_MYSQL_DATABASE`
+- `BLOG_TENANT_ID`
 
 ### Other Platforms
 

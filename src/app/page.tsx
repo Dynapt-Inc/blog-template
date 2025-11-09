@@ -1,12 +1,13 @@
+import Link from "next/link";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
 import PostCard from "@/components/PostCard";
 import { loadPosts, loadSite } from "@/lib/content";
 
-export default function Home() {
+export default async function Home() {
   const siteData = loadSite();
-  const postsData = loadPosts();
+  const postsData = await loadPosts();
   const latestPosts = [...postsData].sort((a, b) => {
     const tb = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
     const ta = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
@@ -58,7 +59,7 @@ export default function Home() {
             </div>
 
             {postsData.length > 6 && (
-              <a
+              <Link
                 href="/posts"
                 className="btn btn-ghost btn-md group hidden sm:inline-flex"
               >
@@ -76,7 +77,7 @@ export default function Home() {
                     d="M17 8l4 4m0 0l-4 4m4-4H3"
                   />
                 </svg>
-              </a>
+              </Link>
             )}
           </div>
 
@@ -94,7 +95,7 @@ export default function Home() {
 
           {postsData.length > 6 && (
             <div className="text-center mt-12">
-              <a
+              <Link
                 href="/posts"
                 className="btn btn-primary btn-lg group sm:hidden"
               >
@@ -112,7 +113,7 @@ export default function Home() {
                     d="M17 8l4 4m0 0l-4 4m4-4H3"
                   />
                 </svg>
-              </a>
+              </Link>
             </div>
           )}
         </div>

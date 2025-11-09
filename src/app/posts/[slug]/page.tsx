@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { loadPosts, loadSite } from "@/lib/content";
+import { loadPostBySlug, loadPosts, loadSite } from "@/lib/content";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Markdown from "@/components/Markdown";
@@ -11,8 +11,8 @@ interface Params {
   slug: string;
 }
 
-export function generateStaticParams() {
-  const all = loadPosts();
+export async function generateStaticParams() {
+  const all = await loadPosts();
   return all.map((p) => ({ slug: p.slug }));
 }
 
@@ -22,7 +22,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = loadPosts().find((p) => p.slug === slug);
+  const post = await loadPostBySlug(slug);
   if (!post) return {};
   return {
     title: post.title,
@@ -49,8 +49,10 @@ export default async function PostPage({
 }) {
   const { slug } = await params;
   const siteData = loadSite();
-  const postsData = loadPosts();
-  const post = postsData.find((p) => p.slug === slug);
+  const [post, postsData] = await Promise.all([
+    loadPostBySlug(slug),
+    loadPosts(),
+  ]);
   if (!post) return notFound();
 
   const formatDate = (dateString?: string) => {

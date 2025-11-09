@@ -10,6 +10,7 @@
     "setup:secrets": "node --env-file=.env.local ./scripts/secrets-setup.ts"
   },
   "dependencies": {
+    "mysql2": "^3.11.3",
     "next": "15.5.0",
     "react": "19.1.0",
     "react-dom": "19.1.0"
