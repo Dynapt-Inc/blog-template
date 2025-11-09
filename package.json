@@ -4,16 +4,15 @@
   "scripts": {
     "dev": "next dev",
     "clean": "rimraf dist",
-    "build:ts": "echo 'Compiling TypeScript...' && tsc -p tsconfig.build.json && echo 'Rewriting path aliases...' && tsc-alias -p tsconfig.build.json && echo 'TypeScript build complete!'",
-    "build": "npm run clean && npm run build:ts && node ./scripts/copy-assets.cjs",
+    "build": "npm run clean && tsup && node ./scripts/copy-assets.cjs",
     "prepublishOnly": "npm run build",
     "start": "next start",
     "lint": "eslint",
     "setup:secrets": "node --env-file=.env.local ./scripts/secrets-setup.ts"
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "sideEffects": [
     "./dist/styles/globals.css"
   ],
@@ -22,10 +21,10 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "default": "./dist/index.js"
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
     },
     "./styles/globals.css": {
       "default": "./dist/styles/globals.css"

@@ -10,21 +10,13 @@ export default defineConfig({
   },
   splitting: false,
   sourcemap: false,
-  clean: true,
+  clean: false, // Don't clean since we copy CSS separately
   outDir: "dist",
   external: ["react", "react-dom", "next"],
-  noExternal: [],
   esbuildOptions(options) {
     options.alias = {
       "@": "./src",
     };
-    // Don't process CSS files - they'll be copied separately
-    options.loader = {
-      ...options.loader,
-      ".css": "empty",
-    };
   },
-  // Disable PostCSS processing
-  postcss: false,
 });
 
