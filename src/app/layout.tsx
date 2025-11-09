@@ -8,16 +8,6 @@ import {
   ThemeData,
 } from "@/lib/content";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export function generateMetadata(): Metadata {
   const site = loadSite();
   const seo: SeoData | undefined = site.seo || loadSeo();
@@ -37,6 +27,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const geistSans = Geist({
+    variable: "--font-geist-sans",
+    subsets: ["latin"],
+  });
+
+  const geistMono = Geist_Mono({
+    variable: "--font-geist-mono",
+    subsets: ["latin"],
+  });
+
   const theme: ThemeData | undefined = loadTheme();
 
   // Prioritize environment variables for runtime CSS custom properties

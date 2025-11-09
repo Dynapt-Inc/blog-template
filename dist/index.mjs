@@ -1,3 +1,5 @@
+// Next.js font loaders - must remain as const declarations
+
 // src/app/layout.tsx
 import { Geist, Geist_Mono } from "next/font/google";
 
@@ -306,14 +308,6 @@ async function loadPostBySlug(slug) {
 }
 
 // src/app/layout.tsx
-var geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"]
-});
-var geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"]
-});
 function generateMetadata() {
   const site = loadSite();
   const seo = site.seo || loadSeo();
@@ -327,6 +321,14 @@ function RootLayout({
   children
 }) {
   var _a, _b, _c, _d, _e;
+  const geistSans = Geist({
+    variable: "--font-geist-sans",
+    subsets: ["latin"]
+  });
+  const geistMono = Geist_Mono({
+    variable: "--font-geist-mono",
+    subsets: ["latin"]
+  });
   const theme = loadTheme();
   const styleVars = {
     "--primary": process.env.NEXT_PUBLIC_PRIMARY_COLOR || ((_a = theme == null ? void 0 : theme.colors) == null ? void 0 : _a.primary),
