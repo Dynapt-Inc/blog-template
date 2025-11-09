@@ -80,59 +80,60 @@ pnpm dev
 
 ```
 src/
-├── app/                    # Next.js App Router
-│   ├── page.tsx           # Homepage with featured articles
+├── app/                    # Next.js App Router entry points
+│   ├── page.tsx            # Homepage with featured articles
 │   ├── posts/
-│   │   ├── page.tsx       # Articles listing with search/filter
-│   │   └── [slug]/
-│   │       └── page.tsx   # Individual article page
-│   ├── layout.tsx         # Root layout with theme support
-│   └── globals.css        # Global styles and CSS variables
-├── components/            # Reusable React components
-│   ├── Header.tsx         # Sticky header with navigation
-│   ├── Hero.tsx           # Hero section with call-to-actions
-│   ├── PostCard.tsx       # Article cards (3 variants)
-│   ├── Footer.tsx         # Enhanced footer with links
-│   ├── Markdown.tsx       # Enhanced markdown renderer
-│   ├── BackButton.tsx     # Smart back navigation
-│   └── RelatedPosts.tsx   # Related articles component
-├── content/               # Local configuration
-│   └── company.json       # Site configuration and theming (optional override)
+│   │   ├── page.tsx        # Articles listing with search/filter
+│   │   └── [slug]/page.tsx # Individual article page
+│   └── layout.tsx          # Root layout with theme support
+├── components/             # Reusable React components
 └── lib/
-    ├── content.ts         # Content loading and processing
-    ├── db.ts              # Cosmos DB connection utilities
-    └── posts.ts           # Queries for published posts
+    ├── brand-config.ts     # Runtime brand config loader + helpers
+    ├── content.ts          # Content loading and processing
+    ├── db.ts               # Cosmos DB connection utilities
+    ├── posts.ts            # Queries for published posts
+    └── site.ts             # Shared Site/Theme/SEO types
+
+brand.config.ts             # Tenant-provided config consumed via createBlogShell
 ```
 
 ## ⚙️ Configuration
 
-### Site Configuration (`src/content/company.json`)
+### Site Configuration (`brand.config.ts`)
 
-```json
-{
-  "site": {
-    "siteName": "Your Blog Name",
-    "logoUrl": "/logo.png",
-    "heroTitle": "Your Hero Title",
-    "heroSubtitle": "Your Hero Subtitle",
-    "heroImageUrl": "https://...",
-    "aboutText": "About your blog...",
-    "contactEmail": "contact@yourblog.com",
-    "theme": {
-      "colors": {
-        "primary": "#2563eb",
-        "secondary": "#6366f1",
-        "tertiary": "#06b6d4"
-      }
-    }
+Every customer repository now ships a tiny config module that defines the allowed brand inputs. The config is typed so Renovate/Dependabot PRs stay safe:
+
+```ts
+import { defineBrandConfig } from "@caleblawson/blog-shell";
+
+export default defineBrandConfig({
+  site: {
+    siteName: "Acme Widgets Blog",
+    logoUrl: "/brand/logo.svg",
+    heroTitle: "Insights from the Acme team",
+    heroSubtitle: "Thought leadership, case studies, and playbooks.",
+    heroImageUrl: "/brand/hero.png",
+    aboutText: "We build tools that make developers faster.",
+    contactEmail: "hello@acme.com",
+    contactPhone: "+1 (555) 123-4567",
+    contactAddress: "500 5th Ave, New York, NY",
+    theme: {
+      colors: {
+        primary: "#2563eb",
+        secondary: "#6366f1",
+        tertiary: "#06b6d4",
+      },
+    },
   },
-  "seo": {
-    "title": "Your SEO Title",
-    "description": "Your SEO Description",
-    "keywords": ["keyword1", "keyword2"]
-  }
-}
+  seo: {
+    title: "Acme Engineering Blog",
+    description: "Ship faster with Acme guidance.",
+    keywords: ["acme", "engineering", "platform"],
+  },
+});
 ```
+
+Store logo files under `public/brand` (or any folder you prefer) so each tenant commits assets alongside the config. The helper simply validates the shape and the shell runtime consumes the object through `createBlogShell`.
 
 ### Environment Variables
 
@@ -172,7 +173,96 @@ NEXT_PUBLIC_SEO_DESCRIPTION="Your SEO Description"
 
 ### Runtime Customization
 
-Brand settings and theme colors can still be sourced from `company.json`, but environment variables always take precedence—perfect for automated deployments per tenant.
+Brand settings and theme colors now come from each tenant's `brand.config.ts`. Environment variables still win at runtime, which keeps automated deployments flexible (blue/green, previews, etc.).
+
+## Multi-Tenant Shell Package
+
+This repository now builds the reusable `@caleblawson/blog-shell` package. Each customer repo stays tiny: commit a `brand.config.ts`, a `/public/brand` folder for assets, and simple wrapper files that re-export the packaged routes.
+
+1. **Install the shell**
+
+   ```bash
+   npm install @caleblawson/blog-shell
+   ```
+
+2. **Create `brand.config.ts`** using the snippet above and commit logos/icons alongside it.
+
+3. **Wire the package into your Next.js `app/` directory**
+
+   ```ts
+   // app/layout.tsx
+   import brandConfig from "../brand.config";
+   import { createBlogShell } from "@caleblawson/blog-shell";
+
+   const { RootLayout, generateRootMetadata } = createBlogShell(brandConfig);
+
+   export const metadata = generateRootMetadata;
+   export default RootLayout;
+   ```
+
+   ```ts
+   // app/page.tsx
+   import brandConfig from "../brand.config";
+   import { createBlogShell } from "@caleblawson/blog-shell";
+
+   const { home } = createBlogShell(brandConfig);
+
+   export const dynamic = home.dynamic;
+   export const revalidate = home.revalidate;
+   export default home.Page;
+   ```
+
+   ```ts
+   // app/posts/page.tsx
+   import brandConfig from "../../brand.config";
+   import { createBlogShell } from "@caleblawson/blog-shell";
+
+   const { postsIndex } = createBlogShell(brandConfig);
+
+   export const dynamic = postsIndex.dynamic;
+   export const revalidate = postsIndex.revalidate;
+   export default postsIndex.Page;
+   ```
+
+   ```ts
+   // app/posts/[slug]/page.tsx
+   import brandConfig from "../../../brand.config";
+   import { createBlogShell } from "@caleblawson/blog-shell";
+
+   const { postDetail } = createBlogShell(brandConfig);
+
+   export const dynamic = postDetail.dynamic;
+   export const revalidate = postDetail.revalidate;
+   export const generateMetadata = postDetail.generateMetadata;
+   export default postDetail.Page;
+   ```
+
+Let Dependabot or Renovate watch `@caleblawson/blog-shell` releases so every tenant repo automatically receives PRs whenever the shared shell ships a new version.
+
+## Publishing to npm
+
+1. **Authenticate**
+
+   ```bash
+   npm login --scope=@caleblawson
+   ```
+
+   Use `--registry=https://registry.npmjs.org` for the public npm registry or point to your private registry/GitHub Packages if desired.
+
+2. **Version the release**  
+   Update `package.json` (`npm version patch|minor|major`) so consumers receive a new semver tag. Commit and push the tag if you track releases in Git.
+
+3. **Build/test**  
+   Run `npm run lint` (and `npm run build` if you add a compile step) to make sure the package is good to go.
+
+4. **Publish**
+
+   ```bash
+   npm publish --access public   # or --access restricted for private scopes
+   ```
+
+5. **Notify consumers**  
+   Your Renovate/Dependabot config will auto-open PRs. If you need manual rollout, share release notes that describe the brand config/API changes.
 
 ## 📝 Content Management
 

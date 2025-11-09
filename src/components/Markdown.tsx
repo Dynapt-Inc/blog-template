@@ -1,3 +1,5 @@
+import type { ReactElement } from "react";
+
 interface MarkdownProps {
   content: string;
 }
@@ -10,7 +12,7 @@ export function Markdown({ content }: MarkdownProps) {
   let codeBlockContent: string[] = [];
   let quoteBlockContent: string[] = [];
 
-  const elements: JSX.Element[] = [];
+  const elements: ReactElement[] = [];
 
   const processInlineFormatting = (text: string) => {
     // Process bold **text**

@@ -7,21 +7,27 @@ import Markdown from "@/components/Markdown";
 import BackButton from "@/components/BackButton";
 import RelatedPosts from "@/components/RelatedPosts";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 interface Params {
   slug: string;
 }
 
-export async function generateStaticParams() {
-  const all = await loadPosts();
-  return all.map((p) => ({ slug: p.slug }));
+interface PostPageProps {
+  params?: Promise<Params>;
+}
+
+async function resolveParams(params?: PostPageProps["params"]) {
+  return params ? await params : null;
 }
 
 export async function generateMetadata({
   params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
-  const { slug } = await params;
+}: PostPageProps): Promise<Metadata> {
+  const resolvedParams = await resolveParams(params);
+  if (!resolvedParams) return {};
+  const { slug } = resolvedParams;
   const post = await loadPostBySlug(slug);
   if (!post) return {};
   return {
@@ -42,12 +48,12 @@ export async function generateMetadata({
   };
 }
 
-export default async function PostPage({
-  params,
-}: {
-  params: Promise<Params>;
-}) {
-  const { slug } = await params;
+export default async function PostPage({ params }: PostPageProps) {
+  const resolvedParams = await resolveParams(params);
+  if (!resolvedParams) {
+    return notFound();
+  }
+  const { slug } = resolvedParams;
   const siteData = loadSite();
   const [post, postsData] = await Promise.all([
     loadPostBySlug(slug),

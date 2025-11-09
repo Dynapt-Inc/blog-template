@@ -1,21 +1,7 @@
-import fs from "fs";
-import path from "path";
+import { unstable_noStore as noStore } from "next/cache";
 import { fetchPostBySlug, fetchPublishedPosts, type BlogPostRecord } from "./posts";
-
-export interface SiteData {
-  siteName: string;
-  logoUrl?: string;
-  heroTitle: string;
-  heroSubtitle: string;
-  heroImageUrl?: string;
-  aboutText: string;
-  aboutImageUrl?: string;
-  contactEmail?: string;
-  contactPhone?: string;
-  contactAddress?: string;
-  theme?: ThemeData;
-  seo?: SeoData;
-}
+import { getBrandConfig } from "./brand-config";
+import type { SeoData, SiteData, ThemeData } from "./site";
 
 export interface PostData {
   slug: string;
@@ -30,42 +16,25 @@ export interface PostData {
   url?: string | null;
 }
 
-interface CompanyFile {
-  site?: SiteData & { theme?: ThemeData };
-  theme?: ThemeData;
-  seo?: SeoData;
-}
-
-const contentRoot = path.join(process.cwd(), "src", "content");
-
-function readJson<T>(filePath: string): T | null {
-  try {
-    const raw = fs.readFileSync(filePath, "utf8");
-    return JSON.parse(raw) as T;
-  } catch {
-    return null;
-  }
-}
-
 export function loadSite(): SiteData {
-  const company = readJson<CompanyFile>(path.join(contentRoot, "company.json"));
+  const brand = getBrandConfig();
+  const siteBlock = brand.site || {};
 
   // Prioritize environment variables for runtime personalization
   const envSiteName = process.env.NEXT_PUBLIC_ORG_NAME || process.env.ORG_NAME;
   const envLogoUrl =
     process.env.NEXT_PUBLIC_ORG_LOGO_URL || process.env.ORG_LOGO_URL;
-  // Use environment variables first, then fall back to company.json, then defaults
+  // Use environment variables first, then fall back to the brand config, then defaults
   const siteName =
-    envSiteName?.trim() || company?.site?.siteName || "Your Company Blog";
-  const logoUrl = envLogoUrl?.trim() || company?.site?.logoUrl;
+    envSiteName?.trim() || siteBlock.siteName || "Your Company Blog";
+  const logoUrl = envLogoUrl?.trim() || siteBlock.logoUrl;
   const heroTitle =
-    company?.site?.heroTitle ||
-    `Insights and stories from the ${siteName} team`;
+    siteBlock.heroTitle || `Insights and stories from the ${siteName} team`;
   const heroSubtitle =
-    company?.site?.heroSubtitle ||
+    siteBlock.heroSubtitle ||
     "Thought leadership, case studies, and best practices to help you grow.";
   const aboutText =
-    company?.site?.aboutText ||
+    siteBlock.aboutText ||
     "We are a team of experts passionate about helping businesses succeed.";
 
   return {
@@ -73,30 +42,20 @@ export function loadSite(): SiteData {
     logoUrl,
     heroTitle,
     heroSubtitle,
-    heroImageUrl: company?.site?.heroImageUrl,
+    heroImageUrl: siteBlock.heroImageUrl,
     aboutText,
-    aboutImageUrl: company?.site?.aboutImageUrl,
-    contactEmail: company?.site?.contactEmail,
-    contactPhone: company?.site?.contactPhone,
-    contactAddress: company?.site?.contactAddress,
+    aboutImageUrl: siteBlock.aboutImageUrl,
+    contactEmail: siteBlock.contactEmail,
+    contactPhone: siteBlock.contactPhone,
+    contactAddress: siteBlock.contactAddress,
     theme: loadTheme(),
     seo: loadSeo(),
   };
 }
 
-export interface ThemeData {
-  colors?: {
-    primary?: string;
-    secondary?: string;
-    tertiary?: string;
-    background?: string;
-    foreground?: string;
-  };
-}
-
 export function loadTheme(): ThemeData | undefined {
-  const company = readJson<CompanyFile>(path.join(contentRoot, "company.json"));
-  const cfg = company?.theme || company?.site?.theme || {};
+  const brand = getBrandConfig();
+  const cfg = brand.theme || brand.site?.theme || {};
   const envPrimary = process.env.NEXT_PUBLIC_PRIMARY_COLOR;
   const envSecondary = process.env.NEXT_PUBLIC_SECONDARY_COLOR;
   const envTertiary = process.env.NEXT_PUBLIC_TERTIARY_COLOR;
@@ -113,14 +72,8 @@ export function loadTheme(): ThemeData | undefined {
   };
 }
 
-export interface SeoData {
-  title?: string;
-  description?: string;
-  keywords?: string | string[];
-}
-
 export function loadSeo(): SeoData | undefined {
-  const company = readJson<CompanyFile>(path.join(contentRoot, "company.json"));
+  const brand = getBrandConfig();
 
   // Prioritize environment variables for SEO
   const envTitle = process.env.NEXT_PUBLIC_SEO_TITLE;
@@ -128,9 +81,12 @@ export function loadSeo(): SeoData | undefined {
   const envKeywords = process.env.NEXT_PUBLIC_SEO_KEYWORDS;
 
   return {
-    title: envTitle || company?.seo?.title,
-    description: envDescription || company?.seo?.description,
-    keywords: envKeywords || company?.seo?.keywords,
+    title: envTitle || brand.seo?.title || brand.site?.seo?.title,
+    description:
+      envDescription ||
+      brand.seo?.description ||
+      brand.site?.seo?.description,
+    keywords: envKeywords || brand.seo?.keywords || brand.site?.seo?.keywords,
   };
 }
 
@@ -189,6 +145,7 @@ function recordToPost(record: BlogPostRecord): PostData {
 }
 
 export async function loadPosts(): Promise<PostData[]> {
+  noStore();
   const tenantId = resolveTenantId();
   if (!tenantId) {
     console.warn(
@@ -201,6 +158,7 @@ export async function loadPosts(): Promise<PostData[]> {
 }
 
 export async function loadPostBySlug(slug: string): Promise<PostData | null> {
+  noStore();
   const tenantId = resolveTenantId();
   if (!tenantId) {
     console.warn(
@@ -211,3 +169,5 @@ export async function loadPostBySlug(slug: string): Promise<PostData | null> {
   const record = await fetchPostBySlug(tenantId, slug);
   return record ? recordToPost(record) : null;
 }
+
+export type { SiteData, ThemeData, SeoData } from "./site";

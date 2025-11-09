@@ -5,6 +5,9 @@ import Footer from "@/components/Footer";
 import PostCard from "@/components/PostCard";
 import { loadPosts, loadSite } from "@/lib/content";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function Home() {
   const siteData = loadSite();
   const postsData = await loadPosts();
@@ -17,7 +20,11 @@ export default async function Home() {
   const featuredPost = latestPosts[0];
   const recentPosts = latestPosts.slice(1, 7);
   const categories = [
-    ...new Set(postsData.map((post) => post.category).filter(Boolean)),
+    ...new Set(
+      postsData
+        .map((post) => post.category)
+        .filter((category): category is string => Boolean(category))
+    ),
   ];
 
   return (
