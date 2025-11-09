@@ -1,0 +1,16 @@
+# Source files - only dist should be published
+# The "files" field in package.json explicitly includes "dist"
+# This .npmignore ensures source files are never accidentally included
+src/
+scripts/
+*.config.*
+tsconfig*.json
+.eslintrc*
+.gitignore
+README.md
+
+# Development files
+.env*
+node_modules/
+.next/
+

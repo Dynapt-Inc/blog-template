@@ -6,6 +6,7 @@
     "clean": "rimraf dist",
     "build:ts": "echo 'Compiling TypeScript...' && tsc -p tsconfig.build.json && echo 'Rewriting path aliases...' && tsc-alias -p tsconfig.build.json && echo 'TypeScript build complete!'",
     "build": "npm run clean && npm run build:ts && node ./scripts/copy-assets.cjs",
+    "prepublishOnly": "npm run build",
     "start": "next start",
     "lint": "eslint",
     "setup:secrets": "node --env-file=.env.local ./scripts/secrets-setup.ts"
@@ -22,9 +23,13 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
       "default": "./dist/index.js"
     },
-    "./styles/globals.css": "./dist/styles/globals.css"
+    "./styles/globals.css": {
+      "default": "./dist/styles/globals.css"
+    }
   },
   "dependencies": {
     "mysql2": "^3.11.3",
