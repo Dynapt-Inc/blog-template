@@ -1,7 +1,4 @@
 "use client";
-import React from "react";
-// Next.js font loaders - must remain as const declarations
-
 // src/app/layout.tsx
 import { Geist, Geist_Mono } from "next/font/google";
 
