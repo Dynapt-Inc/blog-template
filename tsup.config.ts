@@ -13,7 +13,8 @@ export default defineConfig({
   minify: false,
   clean: false,
   outDir: "dist",
-  external: ["react-dom", "next"],
+  // Externalize React and related packages to avoid bundling issues with hooks
+  external: ["react", "react-dom", "next"],
   banner: {
     js: 'import React from "react";\n// Next.js font loaders - must remain as const declarations',
   },
