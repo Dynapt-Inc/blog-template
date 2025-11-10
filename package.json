@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "next dev",
     "clean": "rimraf dist",
-    "build": "npm run clean && tsup && node ./scripts/fix-font-loaders.js && node ./scripts/copy-assets.cjs",
+    "build": "npm run clean && tsup && node ./scripts/fix-font-loaders.js && node ./scripts/fix-client-directives.js && node ./scripts/copy-assets.cjs",
     "prepublishOnly": "npm run build",
     "start": "next start",
     "lint": "eslint",
