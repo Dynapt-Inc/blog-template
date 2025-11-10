@@ -78,7 +78,13 @@ export async function fetchPublishedPosts(
 ): Promise<BlogPostRecord[]> {
   return withConnection(async (connection) => {
     // Ensure limit is an integer to avoid MySQL parameter binding issues
+    // MySQL2 has issues with LIMIT as a parameter, so we use string interpolation
+    // after validating it's a safe integer
     const limitInt = Math.max(1, Math.floor(Number(limit) || 100));
+    // Validate it's a safe integer (not NaN, Infinity, or negative)
+    if (!Number.isFinite(limitInt) || limitInt < 1 || limitInt > 10000) {
+      throw new Error(`Invalid limit value: ${limit}`);
+    }
     const [rows] = await connection.execute<PostRow[]>(
       `
         SELECT ${SELECT_COLUMNS}
@@ -86,9 +92,9 @@ export async function fetchPublishedPosts(
         WHERE organization_id = ?
           AND status = 'published'
         ORDER BY published_at DESC, updated_at DESC
-        LIMIT ?
+        LIMIT ${limitInt}
       `,
-      [organizationId, limitInt]
+      [organizationId]
     );
     return rows.map(toRecord);
   });
