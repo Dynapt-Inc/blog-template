@@ -1,6 +1,6 @@
 # Modern Blog Template
 
-A beautifully designed, responsive blog template built with Next.js, TypeScript, and Tailwind CSS. This template is specifically designed to work seamlessly with the blog generator scraper system, accepting all variable data while providing a modern, user-focused experience.
+A beautifully designed, responsive blog template built with Next.js, TypeScript, and Tailwind CSS. This template is specifically designed as a **reusable npm package** for the blog generator system, allowing multiple users to have their own branded blogs while sharing the same codebase and receiving automatic updates.
 
 ## ✨ Features
 
@@ -37,6 +37,24 @@ A beautifully designed, responsive blog template built with Next.js, TypeScript,
 - **Theme Customization**: Runtime theme customization via environment variables
 - **Dynamic Categories**: Automatic category detection and filtering
 - **Author Management**: Support for multiple authors with avatar generation
+
+### 👥 Multi-User Architecture
+
+This template is designed as an **npm package** (`@caleblawson/blog-shell`) that powers multiple user blogs:
+
+- **Shared Codebase**: All users share the same blog template code, ensuring consistency and easy updates
+- **Per-User Branding**: Each user gets their own `brand.config.ts` file with custom colors, logos, and content
+- **Database Isolation**: Posts are stored in a shared Azure Cosmos DB with tenant-based isolation
+- **Automatic Updates**: When the package is updated, all user blogs automatically get the new features
+- **Environment Configuration**: Runtime customization through environment variables
+
+#### How It Works
+
+1. **Package Installation**: Each user blog installs `@caleblawson/blog-shell`
+2. **Brand Configuration**: Blog generator creates a `brand.config.ts` file with user-specific branding
+3. **Shell Entry Files**: Generated files import components from the package and initialize branding
+4. **Database Connection**: Blogs connect to shared database using tenant IDs for data isolation
+5. **Updates**: Publishing new package versions automatically updates all user blogs
 
 ## 🚀 Getting Started
 

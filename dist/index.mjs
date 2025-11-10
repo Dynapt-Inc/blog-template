@@ -1,3 +1,4 @@
+import React from "react";
 // Next.js font loaders - must remain as const declarations
 
 // src/app/layout.tsx
@@ -308,11 +309,11 @@ async function loadPostBySlug(slug) {
 }
 
 // src/app/layout.tsx
-var geistSans = Geist({
+const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"]
 });
-var geistMono = Geist_Mono({
+const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"]
 });
@@ -1149,6 +1150,7 @@ async function PostsIndexPage() {
 import { notFound } from "next/navigation";
 
 // src/components/Markdown.tsx
+import React2 from "react";
 function Markdown({ content }) {
   const lines = content.split("\n");
   let inCodeBlock = false;
@@ -1179,7 +1181,7 @@ function Markdown({ content }) {
         const language = ((_a = codeBlockContent[0]) == null ? void 0 : _a.replace("```", "").trim()) || "text";
         const code = codeBlockContent.slice(1).join("\n");
         elements.push(
-          /* @__PURE__ */ React.createElement("div", { key: index, className: "my-6" }, /* @__PURE__ */ React.createElement("div", { className: "bg-muted/50 border border-theme rounded-t-lg px-4 py-2 text-sm font-medium text-muted-foreground" }, language), /* @__PURE__ */ React.createElement("pre", { className: "bg-gray-900 text-gray-100 p-4 rounded-b-lg overflow-x-auto" }, /* @__PURE__ */ React.createElement("code", null, code)))
+          /* @__PURE__ */ React2.createElement("div", { key: index, className: "my-6" }, /* @__PURE__ */ React2.createElement("div", { className: "bg-muted/50 border border-theme rounded-t-lg px-4 py-2 text-sm font-medium text-muted-foreground" }, language), /* @__PURE__ */ React2.createElement("pre", { className: "bg-gray-900 text-gray-100 p-4 rounded-b-lg overflow-x-auto" }, /* @__PURE__ */ React2.createElement("code", null, code)))
         );
         codeBlockContent = [];
         inCodeBlock = false;
@@ -1202,13 +1204,13 @@ function Markdown({ content }) {
       return;
     } else if (inQuoteBlock) {
       elements.push(
-        /* @__PURE__ */ React.createElement(
+        /* @__PURE__ */ React2.createElement(
           "blockquote",
           {
             key: index,
             className: "border-l-4 border-primary pl-6 py-4 my-6 bg-muted/30 rounded-r-lg italic"
           },
-          quoteBlockContent.map((quoteLine, qIndex) => /* @__PURE__ */ React.createElement(
+          quoteBlockContent.map((quoteLine, qIndex) => /* @__PURE__ */ React2.createElement(
             "p",
             {
               key: qIndex,
@@ -1225,7 +1227,7 @@ function Markdown({ content }) {
     }
     if (line.startsWith("# ")) {
       elements.push(
-        /* @__PURE__ */ React.createElement(
+        /* @__PURE__ */ React2.createElement(
           "h1",
           {
             key: index,
@@ -1239,7 +1241,7 @@ function Markdown({ content }) {
     }
     if (line.startsWith("## ")) {
       elements.push(
-        /* @__PURE__ */ React.createElement(
+        /* @__PURE__ */ React2.createElement(
           "h2",
           {
             key: index,
@@ -1253,7 +1255,7 @@ function Markdown({ content }) {
     }
     if (line.startsWith("### ")) {
       elements.push(
-        /* @__PURE__ */ React.createElement(
+        /* @__PURE__ */ React2.createElement(
           "h3",
           {
             key: index,
@@ -1267,7 +1269,7 @@ function Markdown({ content }) {
     }
     if (line.startsWith("- ")) {
       elements.push(
-        /* @__PURE__ */ React.createElement(
+        /* @__PURE__ */ React2.createElement(
           "li",
           {
             key: index,
@@ -1282,7 +1284,7 @@ function Markdown({ content }) {
     }
     if (/^\d+\.\s+/.test(line)) {
       elements.push(
-        /* @__PURE__ */ React.createElement(
+        /* @__PURE__ */ React2.createElement(
           "li",
           {
             key: index,
@@ -1296,15 +1298,15 @@ function Markdown({ content }) {
       return;
     }
     if (line.trim() === "---" || line.trim() === "***") {
-      elements.push(/* @__PURE__ */ React.createElement("hr", { key: index, className: "my-8 border-t border-theme" }));
+      elements.push(/* @__PURE__ */ React2.createElement("hr", { key: index, className: "my-8 border-t border-theme" }));
       return;
     }
     if (line.trim() === "") {
-      elements.push(/* @__PURE__ */ React.createElement("div", { key: index, className: "h-4" }));
+      elements.push(/* @__PURE__ */ React2.createElement("div", { key: index, className: "h-4" }));
       return;
     }
     elements.push(
-      /* @__PURE__ */ React.createElement(
+      /* @__PURE__ */ React2.createElement(
         "p",
         {
           key: index,
@@ -1316,13 +1318,13 @@ function Markdown({ content }) {
   });
   if (inQuoteBlock && quoteBlockContent.length > 0) {
     elements.push(
-      /* @__PURE__ */ React.createElement(
+      /* @__PURE__ */ React2.createElement(
         "blockquote",
         {
           key: "final-quote",
           className: "border-l-4 border-primary pl-6 py-4 my-6 bg-muted/30 rounded-r-lg italic"
         },
-        quoteBlockContent.map((quoteLine, qIndex) => /* @__PURE__ */ React.createElement(
+        quoteBlockContent.map((quoteLine, qIndex) => /* @__PURE__ */ React2.createElement(
           "p",
           {
             key: qIndex,
@@ -1335,7 +1337,7 @@ function Markdown({ content }) {
       )
     );
   }
-  return /* @__PURE__ */ React.createElement("div", { className: "prose prose-lg max-w-none" }, elements);
+  return /* @__PURE__ */ React2.createElement("div", { className: "prose prose-lg max-w-none" }, elements);
 }
 var Markdown_default = Markdown;
 
@@ -1585,6 +1587,7 @@ async function PostPage({ params }) {
 }
 
 // src/index.ts
+import { default as default2 } from "react";
 function createBlogShell(config) {
   initializeBrandConfig(config);
   return {
@@ -1609,6 +1612,7 @@ function createBlogShell(config) {
   };
 }
 export {
+  default2 as React,
   createBlogShell,
   defineBrandConfig,
   loadPostBySlug,

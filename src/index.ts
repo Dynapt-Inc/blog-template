@@ -1,3 +1,4 @@
+import React from "react";
 import RootLayout, {
   generateMetadata as generateRootMetadata,
 } from "./app/layout";
@@ -77,3 +78,6 @@ export function createBlogShell(config: BrandConfig): BlogShellEntryPoints {
 export { defineBrandConfig };
 export type { BrandConfig, PostData, SiteData, ThemeData, SeoData };
 export { loadPosts, loadPostBySlug, loadSite, loadTheme, loadSeo };
+
+// Re-export React to ensure it's available for JSX
+export { default as React } from "react";

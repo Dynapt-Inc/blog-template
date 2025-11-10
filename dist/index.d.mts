@@ -1,4 +1,5 @@
 import * as react from 'react';
+export { default as React } from 'react';
 import { Metadata } from 'next';
 
 declare function generateMetadata$1(): Metadata;
