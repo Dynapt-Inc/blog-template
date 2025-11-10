@@ -42,3 +42,6 @@ next-env.d.ts
 
 #rollup
 .rollup.cache
+
+# package build output (not needed for Next.js app build)
+/dist

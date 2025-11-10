@@ -10,7 +10,10 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build
+# Remove dist folder if it exists (package build output, not needed for Next.js app)
+RUN rm -rf dist || true
+# Build the Next.js app (not the package)
+RUN npx next build
 
 FROM node:20-alpine AS runner
 WORKDIR /app

@@ -77,6 +77,8 @@ export async function fetchPublishedPosts(
   limit = 100
 ): Promise<BlogPostRecord[]> {
   return withConnection(async (connection) => {
+    // Ensure limit is an integer to avoid MySQL parameter binding issues
+    const limitInt = Math.max(1, Math.floor(Number(limit) || 100));
     const [rows] = await connection.execute<PostRow[]>(
       `
         SELECT ${SELECT_COLUMNS}
@@ -86,7 +88,7 @@ export async function fetchPublishedPosts(
         ORDER BY published_at DESC, updated_at DESC
         LIMIT ?
       `,
-      [organizationId, limit]
+      [organizationId, limitInt]
     );
     return rows.map(toRecord);
   });
