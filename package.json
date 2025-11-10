@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@caleblawson/blog-shell": "^0.1.29",
+    "@caleblawson/blog-shell": "^0.1.31",
     "mysql2": "^3.11.3",
     "next": "15.5.0",
     "react": "19.1.0",
