@@ -128,6 +128,9 @@ function toRecord(row) {
 async function fetchPublishedPosts(organizationId, limit = 100) {
   return withConnection(async (connection) => {
     const limitInt = Math.max(1, Math.floor(Number(limit) || 100));
+    if (!Number.isFinite(limitInt) || limitInt < 1 || limitInt > 1e4) {
+      throw new Error(`Invalid limit value: ${limit}`);
+    }
     const [rows] = await connection.execute(
       `
         SELECT ${SELECT_COLUMNS}
@@ -135,9 +138,9 @@ async function fetchPublishedPosts(organizationId, limit = 100) {
         WHERE organization_id = ?
           AND status = 'published'
         ORDER BY published_at DESC, updated_at DESC
-        LIMIT ?
+        LIMIT ${limitInt}
       `,
-      [organizationId, limitInt]
+      [organizationId]
     );
     return rows.map(toRecord);
   });
