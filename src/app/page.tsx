@@ -1,10 +1,18 @@
 import Link from "next/link";
 import Header from "@caleblawson/blog-shell/Header";
 import PostCard from "@caleblawson/blog-shell/PostCard";
-import { loadPosts, loadSite } from "@caleblawson/blog-shell";
+import { loadPosts, loadSite } from "@caleblawson/blog-shell/server";
 
 // Simple Hero component for the template
-function Hero({ title, subtitle, imageUrl }: { title: string; subtitle: string; imageUrl?: string }) {
+function Hero({
+  title,
+  subtitle,
+  imageUrl,
+}: {
+  title: string;
+  subtitle: string;
+  imageUrl?: string;
+}) {
   return (
     <section className="bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-20">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">

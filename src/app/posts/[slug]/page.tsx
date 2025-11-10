@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { loadPostBySlug, loadPosts, loadSite } from "@caleblawson/blog-shell";
+import { loadPostBySlug, loadPosts, loadSite } from "@caleblawson/blog-shell/server";
 import Header from "@caleblawson/blog-shell/Header";
 
 export const dynamic = "force-dynamic";

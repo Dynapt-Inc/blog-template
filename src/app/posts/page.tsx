@@ -1,5 +1,5 @@
 import { PostsIndexClient } from "@caleblawson/blog-shell/PostsIndexClient";
-import { loadPosts, loadSite } from "@caleblawson/blog-shell";
+import { loadPosts, loadSite } from "@caleblawson/blog-shell/server";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
