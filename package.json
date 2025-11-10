@@ -1,78 +1,27 @@
 {
-  "name": "@caleblawson/blog-shell",
-  "version": "0.1.27",
+  "name": "blog-template",
+  "version": "1.0.0",
+  "private": true,
   "scripts": {
     "dev": "next dev",
-    "clean": "rimraf dist",
-    "build": "npm run clean && tsup && node ./scripts/fix-font-loaders.js && node ./scripts/fix-client-directives.js && node ./scripts/copy-assets.cjs",
-    "prepublishOnly": "npm run build",
+    "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "setup:secrets": "node --env-file=.env.local ./scripts/secrets-setup.ts"
-  },
-  "main": "./dist/index.mjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
-  "sideEffects": [
-    "./dist/styles/globals.css"
-  ],
-  "files": [
-    "dist"
-  ],
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.mts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.mjs",
-      "default": "./dist/index.mjs"
-    },
-    "./Header": {
-      "types": "./dist/Header.d.ts",
-      "import": "./dist/Header.mjs",
-      "require": "./dist/Header.mjs",
-      "default": "./dist/Header.mjs"
-    },
-    "./PostsIndexClient": {
-      "types": "./dist/PostsIndexClient.d.ts",
-      "import": "./dist/PostsIndexClient.mjs",
-      "require": "./dist/PostsIndexClient.mjs",
-      "default": "./dist/PostsIndexClient.mjs"
-    },
-    "./PostCard": {
-      "types": "./dist/PostCard.d.ts",
-      "import": "./dist/PostCard.mjs",
-      "require": "./dist/PostCard.mjs",
-      "default": "./dist/PostCard.mjs"
-    },
-    "./styles/globals.css": {
-      "default": "./dist/styles/globals.css"
-    }
+    "lint": "next lint"
   },
   "dependencies": {
+    "@caleblawson/blog-shell": "^0.1.27",
     "mysql2": "^3.11.3",
     "next": "15.5.0",
     "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "rimraf": "^5.0.10"
+    "react-dom": "19.1.0"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "@rollup/plugin-typescript": "^12.3.0",
-    "@tailwindcss/postcss": "^4",
-    "@types/libsodium-wrappers": "^0.7.14",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "esbuild": "^0.27.0",
     "eslint": "^9",
     "eslint-config-next": "15.5.0",
-    "libsodium-wrappers": "^0.7.13",
-    "rimraf": "^5.0.0",
-    "rollup": "^4.53.1",
-    "rollup-plugin-dts": "^6.2.3",
     "tailwindcss": "^4",
-    "tsc-alias": "^1.8.16",
-    "tsup": "^8.5.0",
     "typescript": "^5"
   }
 }

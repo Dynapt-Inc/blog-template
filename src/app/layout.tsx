@@ -4,9 +4,7 @@ import {
   loadSite,
   loadTheme,
   loadSeo,
-  SeoData,
-  ThemeData,
-} from "@/lib/content";
+} from "@caleblawson/blog-shell";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,7 +18,7 @@ const geistMono = Geist_Mono({
 
 export function generateMetadata(): Metadata {
   const site = loadSite();
-  const seo: SeoData | undefined = site.seo || loadSeo();
+  const seo = site.seo || loadSeo();
   return {
     title: seo?.title || site.siteName,
     description: seo?.description || site.heroSubtitle,
@@ -38,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  const theme: ThemeData | undefined = loadTheme();
+  const theme = loadTheme();
 
   // Prioritize environment variables for runtime CSS custom properties
   const styleVars: Record<string, string | undefined> = {

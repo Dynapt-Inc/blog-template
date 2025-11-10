@@ -1,6 +1,6 @@
 # Modern Blog Template
 
-A beautifully designed, responsive blog template built with Next.js, TypeScript, and Tailwind CSS. This template is specifically designed as a **reusable npm package** for the blog generator system, allowing multiple users to have their own branded blogs while sharing the same codebase and receiving automatic updates.
+A beautifully designed, responsive blog template built with Next.js, TypeScript, and Tailwind CSS. This template is a **consumer of the @caleblawson/blog-shell package**, providing a clean starting point for new blogs created by the blog generator system.
 
 ## ✨ Features
 
@@ -40,9 +40,9 @@ A beautifully designed, responsive blog template built with Next.js, TypeScript,
 
 ### 👥 Multi-User Architecture
 
-This template is designed as an **npm package** (`@caleblawson/blog-shell`) that powers multiple user blogs:
+This template is a **consumer of the @caleblawson/blog-shell package** that powers multiple user blogs:
 
-- **Shared Codebase**: All users share the same blog template code, ensuring consistency and easy updates
+- **Shared Codebase**: All users share the same blog shell package, ensuring consistency and easy updates
 - **Per-User Branding**: Each user gets their own `brand.config.ts` file with custom colors, logos, and content
 - **Database Isolation**: Posts are stored in a shared Azure Cosmos DB with tenant-based isolation
 - **Automatic Updates**: When the package is updated, all user blogs automatically get the new features
@@ -50,11 +50,12 @@ This template is designed as an **npm package** (`@caleblawson/blog-shell`) that
 
 #### How It Works
 
-1. **Package Installation**: Each user blog installs `@caleblawson/blog-shell`
-2. **Brand Configuration**: Blog generator creates a `brand.config.ts` file with user-specific branding
-3. **Shell Entry Files**: Generated files import components from the package and initialize branding
-4. **Database Connection**: Blogs connect to shared database using tenant IDs for data isolation
-5. **Updates**: Publishing new package versions automatically updates all user blogs
+1. **Template Cloning**: Blog generator clones this template repository for each new blog
+2. **Package Installation**: Template automatically installs `@caleblawson/blog-shell`
+3. **Brand Configuration**: Blog generator creates a `brand.config.ts` file with user-specific branding
+4. **Shell Integration**: Template imports components from the package and initializes branding
+5. **Database Connection**: Blogs connect to shared database using tenant IDs for data isolation
+6. **Updates**: Publishing new package versions automatically updates all user blogs via package manager
 
 ## 🚀 Getting Started
 
@@ -195,7 +196,7 @@ Brand settings and theme colors now come from each tenant's `brand.config.ts`. E
 
 ## Multi-Tenant Shell Package
 
-This repository now builds the reusable `@caleblawson/blog-shell` package. Each customer repo stays tiny: commit a `brand.config.ts`, a `/public/brand` folder for assets, and simple wrapper files that re-export the packaged routes.
+This template consumes the reusable `@caleblawson/blog-shell` package. Each customer repo stays tiny: commit a `brand.config.ts`, a `/public/brand` folder for assets, and simple wrapper files that re-export the packaged routes.
 
 1. **Install the shell**
 
@@ -255,32 +256,7 @@ This repository now builds the reusable `@caleblawson/blog-shell` package. Each 
    export default postDetail.Page;
    ```
 
-Let Dependabot or Renovate watch `@caleblawson/blog-shell` releases so every tenant repo automatically receives PRs whenever the shared shell ships a new version.
-
-## Publishing to npm
-
-1. **Authenticate**
-
-   ```bash
-   npm login --scope=@caleblawson
-   ```
-
-   Use `--registry=https://registry.npmjs.org` for the public npm registry or point to your private registry/GitHub Packages if desired.
-
-2. **Version the release**  
-   Update `package.json` (`npm version patch|minor|major`) so consumers receive a new semver tag. Commit and push the tag if you track releases in Git.
-
-3. **Build/test**  
-   Run `npm run lint` (and `npm run build` if you add a compile step) to make sure the package is good to go.
-
-4. **Publish**
-
-   ```bash
-   npm publish --access public   # or --access restricted for private scopes
-   ```
-
-5. **Notify consumers**  
-   Your Renovate/Dependabot config will auto-open PRs. If you need manual rollout, share release notes that describe the brand config/API changes.
+Let Dependabot or Renovate watch `@caleblawson/blog-shell` releases so every tenant repo automatically receives updates whenever the shared shell ships a new version.
 
 ## 📝 Content Management
 

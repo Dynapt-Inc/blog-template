@@ -1,9 +1,34 @@
 import Link from "next/link";
-import Header from "@/components/Header";
-import Hero from "@/components/Hero";
-import Footer from "@/components/Footer";
-import PostCard from "@/components/PostCard";
-import { loadPosts, loadSite } from "@/lib/content";
+import Header from "@caleblawson/blog-shell/Header";
+import PostCard from "@caleblawson/blog-shell/PostCard";
+import { loadPosts, loadSite } from "@caleblawson/blog-shell";
+
+// Simple Hero component for the template
+function Hero({ title, subtitle, imageUrl }: { title: string; subtitle: string; imageUrl?: string }) {
+  return (
+    <section className="bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-20">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
+        <h1 className="heading-1 mb-6">{title}</h1>
+        <p className="body-large text-muted-foreground max-w-2xl mx-auto">
+          {subtitle}
+        </p>
+      </div>
+    </section>
+  );
+}
+
+// Simple Footer component for the template
+function Footer({ siteName }: { siteName: string }) {
+  return (
+    <footer className="border-t border-theme bg-muted/20 py-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+        <p className="text-muted-foreground">
+          © {new Date().getFullYear()} {siteName}. All rights reserved.
+        </p>
+      </div>
+    </footer>
+  );
+}
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;

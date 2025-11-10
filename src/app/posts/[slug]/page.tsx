@@ -1,14 +1,66 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { loadPostBySlug, loadPosts, loadSite } from "@/lib/content";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import Markdown from "@/components/Markdown";
-import BackButton from "@/components/BackButton";
-import RelatedPosts from "@/components/RelatedPosts";
+import { loadPostBySlug, loadPosts, loadSite } from "@caleblawson/blog-shell";
+import Header from "@caleblawson/blog-shell/Header";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+
+// Simple components for the template
+function Footer({ siteName }: { siteName: string }) {
+  return (
+    <footer className="border-t border-theme bg-muted/20 py-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+        <p className="text-muted-foreground">
+          © {new Date().getFullYear()} {siteName}. All rights reserved.
+        </p>
+      </div>
+    </footer>
+  );
+}
+
+function BackButton() {
+  return (
+    <a href="/posts" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-theme bg-card hover:bg-muted transition-colors">
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+      </svg>
+      Back to Posts
+    </a>
+  );
+}
+
+function Markdown({ content }: { content: string }) {
+  return (
+    <div className="prose prose-lg max-w-none">
+      <div dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, '<br>') }} />
+    </div>
+  );
+}
+
+function RelatedPosts({ currentPost, allPosts, maxPosts }: { currentPost: any; allPosts: any[]; maxPosts: number }) {
+  const related = allPosts
+    .filter(post => post.slug !== currentPost.slug)
+    .slice(0, maxPosts);
+
+  return (
+    <div>
+      <h2 className="heading-2 mb-8 text-center">Related Posts</h2>
+      <div className="grid gap-6 md:grid-cols-3">
+        {related.map(post => (
+          <div key={post.slug} className="card p-6">
+            <h3 className="font-semibold mb-2">
+              <a href={`/posts/${post.slug}`} className="hover:text-primary transition-colors">
+                {post.title}
+              </a>
+            </h3>
+            <p className="text-muted-foreground text-sm">{post.excerpt}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 interface Params {
   slug: string;
