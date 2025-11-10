@@ -353,6 +353,8 @@ function RootLayout({
 // src/app/page.tsx
 import Link5 from "next/link";
 
+"use client";
+
 // src/components/Header.tsx
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -659,6 +661,8 @@ function Footer({ siteName }) {
 }
 var Footer_default = Footer;
 
+"use client";
+
 // src/components/PostCard.tsx
 import Link4 from "next/link";
 function PostCard({
@@ -918,6 +922,8 @@ async function Home() {
     }
   ), /* @__PURE__ */ React.createElement("button", { className: "btn bg-white text-primary hover:bg-white/90 btn-md font-semibold" }, "Subscribe")), /* @__PURE__ */ React.createElement("p", { className: "text-white/70 text-sm mt-4" }, "No spam, unsubscribe at any time"))), /* @__PURE__ */ React.createElement(Footer_default, { siteName: siteData.siteName }));
 }
+
+"use client";
 
 // src/components/PostsIndexClient.tsx
 import { useMemo, useState as useState2 } from "react";
