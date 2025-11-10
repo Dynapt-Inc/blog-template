@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 // Next.js font loaders - must remain as const declarations
 
