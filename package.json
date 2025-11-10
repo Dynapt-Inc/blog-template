@@ -1,6 +1,6 @@
 {
   "name": "@caleblawson/blog-shell",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "scripts": {
     "dev": "next dev",
     "clean": "rimraf dist",
