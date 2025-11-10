@@ -1,6 +1,6 @@
 {
   "name": "@caleblawson/blog-shell",
-  "version": "0.1.25",
+  "version": "0.1.26",
   "scripts": {
     "dev": "next dev",
     "clean": "rimraf dist",
@@ -25,6 +25,24 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.mjs",
       "default": "./dist/index.mjs"
+    },
+    "./Header": {
+      "types": "./dist/Header.d.ts",
+      "import": "./dist/Header.mjs",
+      "require": "./dist/Header.mjs",
+      "default": "./dist/Header.mjs"
+    },
+    "./PostsIndexClient": {
+      "types": "./dist/PostsIndexClient.d.ts",
+      "import": "./dist/PostsIndexClient.mjs",
+      "require": "./dist/PostsIndexClient.mjs",
+      "default": "./dist/PostsIndexClient.mjs"
+    },
+    "./PostCard": {
+      "types": "./dist/PostCard.d.ts",
+      "import": "./dist/PostCard.mjs",
+      "require": "./dist/PostCard.mjs",
+      "default": "./dist/PostCard.mjs"
     },
     "./styles/globals.css": {
       "default": "./dist/styles/globals.css"
