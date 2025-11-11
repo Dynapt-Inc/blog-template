@@ -43,7 +43,7 @@ A beautifully designed, responsive blog template built with Next.js, TypeScript,
 This template is a **consumer of the @caleblawson/blog-shell package** that powers multiple user blogs:
 
 - **Shared Codebase**: All users share the same blog shell package, ensuring consistency and easy updates
-- **Per-User Branding**: Each user gets their own `brand.config.ts` file with custom colors, logos, and content
+- **Per-User Branding**: Each user gets their own `brand-config.ts` file with custom colors, logos, and content
 - **Database Isolation**: Posts are stored in a shared Azure Cosmos DB with tenant-based isolation
 - **Automatic Updates**: When the package is updated, all user blogs automatically get the new features
 - **Environment Configuration**: Runtime customization through environment variables
@@ -52,7 +52,7 @@ This template is a **consumer of the @caleblawson/blog-shell package** that powe
 
 1. **Template Cloning**: Blog generator clones this template repository for each new blog
 2. **Package Installation**: Template automatically installs `@caleblawson/blog-shell`
-3. **Brand Configuration**: Blog generator creates a `brand.config.ts` file with user-specific branding
+3. **Brand Configuration**: Blog generator creates a `brand-config.ts` file with user-specific branding
 4. **Shell Integration**: Template imports components from the package and initializes branding
 5. **Database Connection**: Blogs connect to shared database using tenant IDs for data isolation
 6. **Updates**: Publishing new package versions automatically updates all user blogs via package manager
@@ -73,14 +73,10 @@ git clone <repository-url>
 cd blog-template
 ```
 
-2. Install dependencies:
+2. Run the setup script (builds dependencies and configures CSS):
 
 ```bash
-npm install
-# or
-yarn install
-# or
-pnpm install
+npm run setup
 ```
 
 3. Start the development server:
@@ -113,12 +109,12 @@ src/
     ├── posts.ts            # Queries for published posts
     └── site.ts             # Shared Site/Theme/SEO types
 
-brand.config.ts             # Tenant-provided config consumed via createBlogShell
+brand-config.ts             # Tenant-provided config consumed via createBlogShell
 ```
 
 ## ⚙️ Configuration
 
-### Site Configuration (`brand.config.ts`)
+### Site Configuration (`brand-config.ts`)
 
 Every customer repository now ships a tiny config module that defines the allowed brand inputs. The config is typed so Renovate/Dependabot PRs stay safe:
 
@@ -192,11 +188,11 @@ NEXT_PUBLIC_SEO_DESCRIPTION="Your SEO Description"
 
 ### Runtime Customization
 
-Brand settings and theme colors now come from each tenant's `brand.config.ts`. Environment variables still win at runtime, which keeps automated deployments flexible (blue/green, previews, etc.).
+Brand settings and theme colors now come from each tenant's `brand-config.ts`. Environment variables still win at runtime, which keeps automated deployments flexible (blue/green, previews, etc.).
 
 ## Multi-Tenant Shell Package
 
-This template consumes the reusable `@caleblawson/blog-shell` package. Each customer repo stays tiny: commit a `brand.config.ts`, a `/public/brand` folder for assets, and simple wrapper files that re-export the packaged routes.
+This template consumes the reusable `@caleblawson/blog-shell` package. Each customer repo stays tiny: commit a `brand-config.ts`, a `/public/brand` folder for assets, and simple wrapper files that re-export the packaged routes.
 
 1. **Install the shell**
 
@@ -204,13 +200,13 @@ This template consumes the reusable `@caleblawson/blog-shell` package. Each cust
    npm install @caleblawson/blog-shell
    ```
 
-2. **Create `brand.config.ts`** using the snippet above and commit logos/icons alongside it.
+2. **Create `brand-config.ts`** using the snippet above and commit logos/icons alongside it.
 
 3. **Wire the package into your Next.js `app/` directory**
 
    ```ts
    // app/layout.tsx
-   import brandConfig from "../brand.config";
+   import brandConfig from "../brand-config";
    import { createBlogShell } from "@caleblawson/blog-shell";
 
    const { RootLayout, generateRootMetadata } = createBlogShell(brandConfig);
@@ -221,7 +217,7 @@ This template consumes the reusable `@caleblawson/blog-shell` package. Each cust
 
    ```ts
    // app/page.tsx
-   import brandConfig from "../brand.config";
+   import brandConfig from "../brand-config";
    import { createBlogShell } from "@caleblawson/blog-shell";
 
    const { home } = createBlogShell(brandConfig);
@@ -233,7 +229,7 @@ This template consumes the reusable `@caleblawson/blog-shell` package. Each cust
 
    ```ts
    // app/posts/page.tsx
-   import brandConfig from "../../brand.config";
+   import brandConfig from "../../brand-config";
    import { createBlogShell } from "@caleblawson/blog-shell";
 
    const { postsIndex } = createBlogShell(brandConfig);
@@ -245,7 +241,7 @@ This template consumes the reusable `@caleblawson/blog-shell` package. Each cust
 
    ```ts
    // app/posts/[slug]/page.tsx
-   import brandConfig from "../../../brand.config";
+   import brandConfig from "../../../brand-config";
    import { createBlogShell } from "@caleblawson/blog-shell";
 
    const { postDetail } = createBlogShell(brandConfig);

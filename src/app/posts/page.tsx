@@ -3,7 +3,7 @@ import { brandConfig } from "../../brand-config";
 
 const { postsIndex } = createBlogShell(brandConfig);
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const dynamic = postsIndex.dynamic;
+export const revalidate = postsIndex.revalidate;
 
 export default postsIndex.Page;
