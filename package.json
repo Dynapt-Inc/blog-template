@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "setup": "./scripts/setup-blog.sh",
-    "prebuild": "cd ../blog-generator/packages/blog-shell && npm install && npm run build",
     "build": "npm install && next build",
     "dev": "next dev",
     "start": "next start",

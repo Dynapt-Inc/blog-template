@@ -26,3 +26,5 @@ echo "Blog setup complete!"
 echo ""
 echo "To start development:"
 echo "  npm run dev"
+
+
